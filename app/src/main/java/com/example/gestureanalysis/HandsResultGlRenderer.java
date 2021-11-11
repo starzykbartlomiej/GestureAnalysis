@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.mediapipe.examples.hands;
+package com.example.gestureanalysis;
 
 import android.opengl.GLES20;
 import com.google.mediapipe.formats.proto.LandmarkProto.NormalizedLandmark;
