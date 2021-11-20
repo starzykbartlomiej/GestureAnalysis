@@ -331,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
         cameraInput.start(
                 this,
                 hands.getGlContext(),
-                CameraInput.CameraFacing.FRONT,
+                CameraInput.CameraFacing.BACK,
                 glSurfaceView.getWidth(),
                 glSurfaceView.getHeight());
     }
