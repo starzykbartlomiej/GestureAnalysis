@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
@@ -41,6 +43,7 @@ import com.google.mediapipe.solutions.hands.HandsResult;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 // ContentResolver dependency
 
@@ -78,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
+        Objects.requireNonNull(getSupportActionBar()).hide(); //hide the title bar
         setContentView(R.layout.activity_main);
         setupStaticImageDemoUiComponents();
         setupVideoDemoUiComponents();
