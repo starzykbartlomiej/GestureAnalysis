@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private Hands hands;
+    private final GestureCalculations gestureCalculations = new GestureCalculations();
     // Run the pipeline and the model inference on GPU or CPU.
     private static final boolean RUN_ON_GPU = false;
 
@@ -64,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
     private InputSource inputSource = InputSource.UNKNOWN;
 
     // Image demo UI and image loader components.
-    private ActivityResultLauncher<Intent> imageGetter;
     private HandsResultImageView imageView;
+    private ActivityResultLauncher<Intent> imageGetter;
     // Video demo UI and video loader components.
     private VideoInput videoInput;
     private ActivityResultLauncher<Intent> videoGetter;
@@ -212,7 +213,9 @@ public class MainActivity extends AppCompatActivity {
         // Connects MediaPipe Hands solution to the user-defined HandsResultImageView.
         hands.setResultListener(
                 handsResult -> {
-                    logWristLandmark(handsResult, /*showPixelValues=*/ true);
+//                    logWristLandmark(handsResult, /*showPixelValues=*/ true);
+//                    gestureCalculations.logLandmarkPosition(handsResult, true, 8);
+                    gestureCalculations.detectDigit(handsResult, false);
                     imageView.setHandsResult(handsResult);
                     runOnUiThread(() -> imageView.update());
                 });
@@ -307,7 +310,8 @@ public class MainActivity extends AppCompatActivity {
         glSurfaceView.setRenderInputImage(true);
         hands.setResultListener(
                 handsResult -> {
-                    logWristLandmark(handsResult, /*showPixelValues=*/ false);
+//                    logWristLandmark(handsResult, /*showPixelValues=*/ false);
+                    gestureCalculations.detectDigit(handsResult, true);
                     glSurfaceView.setRenderData(handsResult);
                     glSurfaceView.requestRender();
                 });
