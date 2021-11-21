@@ -7,7 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="gesture_app_1">#FFFFFFFF</color>
-    <color name="gesture_app_2">#000000</color>
-    <color name="gesture_app_3">#44444C</color>
+    <color name="gesture_app_white">#FFFFFFFF</color>
+    <color name="gesture_app_black">#000000</color>
+    <color name="gesture_app_gray">#44444C</color>
 </resources>

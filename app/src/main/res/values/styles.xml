@@ -2,9 +2,9 @@
 <!-- Base application theme. -->
 <style name="AppTheme" parent="Theme.MaterialComponents">
     <!-- Primary brand color. -->
-    <item name="colorPrimary">@color/purple_200</item>
-    <item name="colorPrimaryVariant">@color/purple_700</item>
-    <item name="colorOnPrimary">@color/black</item>
+    <item name="colorPrimary">@color/gesture_app_gray</item>
+    <item name="colorPrimaryVariant">@color/gesture_app_gray</item>
+    <item name="colorOnPrimary">@color/gesture_app_white</item>
     <!-- Secondary brand color. -->
     <item name="colorSecondary">@color/teal_200</item>
     <item name="colorSecondaryVariant">@color/teal_200</item>

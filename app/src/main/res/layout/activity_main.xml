@@ -4,15 +4,76 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/buttons_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/AppTheme" android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_weight="2"
+        android:background="@color/black">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/button_flash"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/flash" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/text_number"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:layout_weight="5"
+            android:background="@drawable/rounded_corner"
+
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="center"
+            android:text="Number"
+            android:textAllCaps="true"
+            android:textColor="@color/gesture_app_white"
+            android:textSize="14sp" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/button_change_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/change_camera" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/preview_display_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="100">
+
         <TextView
             android:id="@+id/no_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/gesture_app_black"
             android:gravity="center"
             android:text="@string/instruction" />
     </FrameLayout>
@@ -23,25 +84,48 @@
         android:layout_height="wrap_content"
         style="@style/AppTheme" android:gravity="center"
         android:orientation="horizontal"
-        android:layout_weight="1">
+        android:layout_weight="2"
+        android:background="@color/black">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/button_load_picture"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="@string/load_picture"
             android:layout_weight="1"/>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <Button
             android:id="@+id/button_load_video"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="@string/load_video"
             android:layout_weight="1"/>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <Button
             android:id="@+id/button_start_camera"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="@string/start_camera"
             android:layout_weight="1"/>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </LinearLayout>
 </LinearLayout>
