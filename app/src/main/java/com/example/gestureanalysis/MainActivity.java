@@ -14,9 +14,14 @@
 
 package com.example.gestureanalysis;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -25,6 +30,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -76,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
     // Live camera demo UI and camera components.
     private CameraInput cameraInput;
 
+    //Camera Flash
+    private Button flashButton;
+    boolean hasCameraFlash = false;
+    boolean flashOn = false;
+
     private SolutionGlSurfaceView<HandsResult> glSurfaceView;
 
     @Override
@@ -87,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         setupStaticImageDemoUiComponents();
         setupVideoDemoUiComponents();
         setupLiveDemoUiComponents();
+        setupFlash();
     }
 
     @Override
@@ -396,4 +409,51 @@ public class MainActivity extends AppCompatActivity {
                                 + " approximate geometric center): x=%f m, y=%f m, z=%f m",
                         wristWorldLandmark.getX(), wristWorldLandmark.getY(), wristWorldLandmark.getZ()));
     }
+
+    private void setupFlash() {
+        flashButton = findViewById(R.id.flash_button);
+        hasCameraFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+        flashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (hasCameraFlash) {
+                    if (flashOn) {
+                        flashOn = false;
+                        try {
+                            flashLightOff();
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        flashOn = true;
+                        try {
+                            flashLightOn();
+                        } catch (CameraAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            "Flash unavailable for this camera", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        });
+    }
+    @SuppressLint("NewApi")
+    private void flashLightOff() throws CameraAccessException {
+        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        String cameraId = cameraManager.getCameraIdList()[0];
+        cameraManager.setTorchMode(cameraId, false);
+        Toast.makeText(MainActivity.this, "FlashLight OFF", Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressLint("NewApi")
+    private void flashLightOn() throws CameraAccessException {
+        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        String cameraId = cameraManager.getCameraIdList()[0];
+        cameraManager.setTorchMode(cameraId, true);
+        Toast.makeText(MainActivity.this, "FlashLight ON", Toast.LENGTH_SHORT).show();
+    }
+
 }

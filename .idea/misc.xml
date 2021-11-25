@@ -5,6 +5,8 @@
       <map>
         <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.38645833333333335" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_main2.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_main3.xml" value="0.1" />
       </map>
     </option>
   </component>

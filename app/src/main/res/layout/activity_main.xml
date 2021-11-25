@@ -20,7 +20,7 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/button_flash"
+            android:id="@+id/flash_button"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_weight="1"
@@ -75,7 +75,8 @@
             android:layout_height="match_parent"
             android:background="@color/gesture_app_black"
             android:gravity="center"
-            android:text="@string/instruction" />
+            android:text="@string/instruction"
+            android:textColor="@color/gesture_app_white"/>
     </FrameLayout>
 
     <LinearLayout
