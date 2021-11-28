@@ -22,12 +22,12 @@
 
 
         <Button
-            android:id="@+id/flash_button"
+            android:id="@+id/back_button"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/flash"
-            app:icon="@drawable/ic_flash"
+            android:text="@string/back"
+            app:icon="@drawable/ic_back"
             style="?attr/materialButtonOutlinedStyle"
             app:iconTint="@color/white"
             android:textColor="@color/white"

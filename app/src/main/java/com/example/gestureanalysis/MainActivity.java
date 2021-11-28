@@ -23,6 +23,8 @@ import android.graphics.Matrix;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -86,23 +88,20 @@ public class MainActivity extends AppCompatActivity {
 
     private SolutionGlSurfaceView<HandsResult> glSurfaceView;
 
-    //Camera Flash
-    private MaterialButton flashButton;
-    boolean hasCameraFlash = false;
-    boolean flashOn = false;
-
     //Digits
     private final GestureCalculations gestureCalculations = new GestureCalculations();
     private TextView textNumber;
 
-    //Camera flip
-    private MaterialButton FlipCamera;
-    private boolean isBackCameraOn = false;
+    private boolean isBackCameraOn = true;
+
+    private Vibrator vibrator;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);//will hide the title
         Objects.requireNonNull(getSupportActionBar()).hide(); //hide the title bar
         setContentView(R.layout.activity_main);
@@ -110,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
         setupVideoDemoUiComponents();
         setupLiveDemoUiComponents();
         setupDigitResult();
-        setupFlash();
         setupCameraFlip();
+        setupBackButton();
     }
 
     @Override
@@ -221,6 +220,16 @@ public class MainActivity extends AppCompatActivity {
                     Intent pickImageIntent = new Intent(Intent.ACTION_PICK);
                     pickImageIntent.setDataAndType(MediaStore.Images.Media.INTERNAL_CONTENT_URI, "image/*");
                     imageGetter.launch(pickImageIntent);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+
+                        // create vibrator effect with the constant EFFECT_CLICK
+                        VibrationEffect vibrationEffect2 = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+
+                        // it is safe to cancel other vibrations currently taking place
+                        vibrator.cancel();
+
+                        vibrator.vibrate(vibrationEffect2);
+                    }
                 });
         imageView = new HandsResultImageView(this);
     }
@@ -291,6 +300,16 @@ public class MainActivity extends AppCompatActivity {
                     Intent pickVideoIntent = new Intent(Intent.ACTION_PICK);
                     pickVideoIntent.setDataAndType(MediaStore.Video.Media.INTERNAL_CONTENT_URI, "video/*");
                     videoGetter.launch(pickVideoIntent);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+
+                        // create vibrator effect with the constant EFFECT_CLICK
+                        VibrationEffect vibrationEffect2 = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+
+                        // it is safe to cancel other vibrations currently taking place
+                        vibrator.cancel();
+
+                        vibrator.vibrate(vibrationEffect2);
+                    }
                 });
     }
 
@@ -306,6 +325,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                     stopCurrentPipeline();
                     setupStreamingModePipeline(InputSource.CAMERA);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+
+                        // create vibrator effect with the constant EFFECT_CLICK
+                        VibrationEffect vibrationEffect2 = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+
+                        // it is safe to cancel other vibrations currently taking place
+                        vibrator.cancel();
+
+                        vibrator.vibrate(vibrationEffect2);
+                    }
                 });
     }
 
@@ -363,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startCamera(boolean isBackCameraOn) {
-        if(isBackCameraOn) {
+        if (isBackCameraOn) {
             cameraInput.start(
                     this,
                     hands.getGlContext(),
@@ -433,52 +462,23 @@ public class MainActivity extends AppCompatActivity {
                         wristWorldLandmark.getX(), wristWorldLandmark.getY(), wristWorldLandmark.getZ()));
     }
 
-    private void setupFlash() {
-        flashButton = findViewById(R.id.flash_button);
-        hasCameraFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-        flashButton.setOnClickListener(view -> {
-            if (hasCameraFlash) {
-                if (flashOn) {
-                    flashOn = false;
-                    try {
-                        flashLightOff();
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    flashOn = true;
-                    try {
-                        flashLightOn();
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                Toast.makeText(MainActivity.this,
-                        "Flash unavailable for this camera", Toast.LENGTH_LONG).show();
+    private void setupBackButton() {
+        //Camera Flash
+        Button backButton = findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goBack();
             }
         });
     }
 
-    @SuppressLint("NewApi")
-    private void flashLightOff() throws CameraAccessException {
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        String cameraId = cameraManager.getCameraIdList()[0];
-        cameraManager.setTorchMode(cameraId, false);
-        Toast.makeText(MainActivity.this, "FlashLight OFF", Toast.LENGTH_SHORT).show();
+    private void goBack() {
+        Intent intent = new Intent(this, MainActivity2.class);
+        startActivity(intent);
     }
 
-    @SuppressLint("NewApi")
-    private void flashLightOn() throws CameraAccessException {
-        CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        String cameraId = cameraManager.getCameraIdList()[0];
-        cameraManager.setTorchMode(cameraId, true);
-        Toast.makeText(MainActivity.this, "FlashLight ON", Toast.LENGTH_SHORT).show();
-
-    }
-
-    private void setupDigitResult()
-    {
+    private void setupDigitResult() {
         textNumber = findViewById(R.id.text_number);
     }
 
@@ -488,9 +488,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupCameraFlip() {
-        FlipCamera = findViewById(R.id.button_change_camera);
-        FlipCamera.setOnClickListener(view -> {
-            if(isBackCameraOn){
+        //Camera flip
+        Button flipCamera = findViewById(R.id.button_change_camera);
+        flipCamera.setOnClickListener(view -> {
+            if(inputSource != InputSource.CAMERA){
+                return;
+            }
+            if (isBackCameraOn) {
                 // change to front
                 isBackCameraOn = false;
                 stopCurrentPipeline();
@@ -500,6 +504,16 @@ public class MainActivity extends AppCompatActivity {
                 isBackCameraOn = true;
                 stopCurrentPipeline();
                 setupStreamingModePipeline(InputSource.CAMERA);
+            }
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+
+                // create vibrator effect with the constant EFFECT_CLICK
+                VibrationEffect vibrationEffect2 = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK);
+
+                // it is safe to cancel other vibrations currently taking place
+                vibrator.cancel();
+
+                vibrator.vibrate(vibrationEffect2);
             }
         });
     }
