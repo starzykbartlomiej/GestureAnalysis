@@ -9,4 +9,5 @@
     <string name="app_main_image">App main image</string>
     <string name="app_desc">Recognize numbers, letters and specific gestures.</string>
     <string name="app_title">Hand Gesture Recognition app</string>
+    <string name="number">Number</string>
 </resources>

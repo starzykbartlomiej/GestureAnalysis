@@ -27,10 +27,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private Hands hands;
-    private final GestureCalculations gestureCalculations = new GestureCalculations();
     // Run the pipeline and the model inference on GPU or CPU.
     private static final boolean RUN_ON_GPU = false;
 
@@ -83,12 +82,21 @@ public class MainActivity extends AppCompatActivity {
     // Live camera demo UI and camera components.
     private CameraInput cameraInput;
 
+    private SolutionGlSurfaceView<HandsResult> glSurfaceView;
+
     //Camera Flash
     private ImageButton flashButton;
     boolean hasCameraFlash = false;
     boolean flashOn = false;
 
-    private SolutionGlSurfaceView<HandsResult> glSurfaceView;
+    //Digits
+    private final GestureCalculations gestureCalculations = new GestureCalculations();
+    private TextView textNumber;
+
+    //Camera flip
+    private ImageButton FlipCamera;
+    private boolean isBackCameraOn = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +107,9 @@ public class MainActivity extends AppCompatActivity {
         setupStaticImageDemoUiComponents();
         setupVideoDemoUiComponents();
         setupLiveDemoUiComponents();
+        setupDigitResult();
         setupFlash();
+        setupCameraFlip();
     }
 
     @Override
@@ -109,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             // Restarts the camera and the opengl surface rendering.
             cameraInput = new CameraInput(this);
             cameraInput.setNewFrameListener(textureFrame -> hands.send(textureFrame));
-            glSurfaceView.post(this::startCamera);
+            glSurfaceView.post(() -> startCamera(isBackCameraOn));
             glSurfaceView.setVisibility(View.VISIBLE);
         } else if (inputSource == InputSource.VIDEO) {
             videoInput.resume();
@@ -232,8 +242,8 @@ public class MainActivity extends AppCompatActivity {
         hands.setResultListener(
                 handsResult -> {
 //                    logWristLandmark(handsResult, /*showPixelValues=*/ true);
-//                    gestureCalculations.logLandmarkPosition(handsResult, true, 8);
-                    gestureCalculations.detectDigit(handsResult, false);
+                    gestureCalculations.detectDigit(handsResult, true);
+                    runOnUiThread(this::updateDigitResult);
                     imageView.setHandsResult(handsResult);
                     runOnUiThread(() -> imageView.update());
                 });
@@ -328,8 +338,9 @@ public class MainActivity extends AppCompatActivity {
         glSurfaceView.setRenderInputImage(true);
         hands.setResultListener(
                 handsResult -> {
-//                    logWristLandmark(handsResult, /*showPixelValues=*/ false);
+//                    gestureCalculations.logDigit(handsResult, true);
                     gestureCalculations.detectDigit(handsResult, true);
+                    runOnUiThread(this::updateDigitResult);
                     glSurfaceView.setRenderData(handsResult);
                     glSurfaceView.requestRender();
                 });
@@ -337,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         // The runnable to start camera after the gl surface view is attached.
         // For video input source, videoInput.start() will be called when the video uri is available.
         if (inputSource == InputSource.CAMERA) {
-            glSurfaceView.post(this::startCamera);
+            glSurfaceView.post(() -> startCamera(isBackCameraOn));
         }
 
         // Updates the preview layout.
@@ -349,13 +360,22 @@ public class MainActivity extends AppCompatActivity {
         frameLayout.requestLayout();
     }
 
-    private void startCamera() {
-        cameraInput.start(
-                this,
-                hands.getGlContext(),
-                CameraInput.CameraFacing.BACK,
-                glSurfaceView.getWidth(),
-                glSurfaceView.getHeight());
+    private void startCamera(boolean isBackCameraOn) {
+        if(isBackCameraOn) {
+            cameraInput.start(
+                    this,
+                    hands.getGlContext(),
+                    CameraInput.CameraFacing.BACK,
+                    glSurfaceView.getWidth(),
+                    glSurfaceView.getHeight());
+        } else {
+            cameraInput.start(
+                    this,
+                    hands.getGlContext(),
+                    CameraInput.CameraFacing.FRONT,
+                    glSurfaceView.getWidth(),
+                    glSurfaceView.getHeight());
+        }
     }
 
     private void stopCurrentPipeline() {
@@ -413,33 +433,30 @@ public class MainActivity extends AppCompatActivity {
     private void setupFlash() {
         flashButton = findViewById(R.id.flash_button);
         hasCameraFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-        flashButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (hasCameraFlash) {
-                    if (flashOn) {
-                        flashOn = false;
-                        try {
-                            flashLightOff();
-                        } catch (CameraAccessException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        flashOn = true;
-                        try {
-                            flashLightOn();
-                        } catch (CameraAccessException e) {
-                            e.printStackTrace();
-                        }
+        flashButton.setOnClickListener(view -> {
+            if (hasCameraFlash) {
+                if (flashOn) {
+                    flashOn = false;
+                    try {
+                        flashLightOff();
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(MainActivity.this,
-                            "Flash unavailable for this camera", Toast.LENGTH_LONG).show();
+                    flashOn = true;
+                    try {
+                        flashLightOn();
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } else {
+                Toast.makeText(MainActivity.this,
+                        "Flash unavailable for this camera", Toast.LENGTH_LONG).show();
             }
-
         });
     }
+
     @SuppressLint("NewApi")
     private void flashLightOff() throws CameraAccessException {
         CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
@@ -456,4 +473,31 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, "FlashLight ON", Toast.LENGTH_SHORT).show();
     }
 
+    private void setupDigitResult()
+    {
+        textNumber = findViewById(R.id.text_number);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void updateDigitResult()
+    {
+        textNumber.setText(Integer.toString(gestureCalculations._digit));
+    }
+
+    private void setupCameraFlip() {
+        FlipCamera = findViewById(R.id.button_change_camera);
+        FlipCamera.setOnClickListener(view -> {
+            if(isBackCameraOn){
+                // change to front
+                isBackCameraOn = false;
+                stopCurrentPipeline();
+                setupStreamingModePipeline(InputSource.CAMERA);
+            } else {
+                // change to back
+                isBackCameraOn = true;
+                stopCurrentPipeline();
+                setupStreamingModePipeline(InputSource.CAMERA);
+            }
+        });
+    }
 }

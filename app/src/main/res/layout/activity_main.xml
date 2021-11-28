@@ -42,7 +42,7 @@
 
             android:fontFamily="@font/roboto_medium"
             android:gravity="center"
-            android:text="Number"
+            android:text="@string/number"
             android:textAllCaps="true"
             android:textColor="@color/gesture_app_white"
             android:textSize="14sp" />
