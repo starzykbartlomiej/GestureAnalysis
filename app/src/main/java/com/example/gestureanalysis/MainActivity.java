@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -368,6 +369,7 @@ public class MainActivity extends AppCompatActivity {
                     CameraInput.CameraFacing.BACK,
                     glSurfaceView.getWidth(),
                     glSurfaceView.getHeight());
+
         } else {
             cameraInput.start(
                     this,
@@ -471,6 +473,7 @@ public class MainActivity extends AppCompatActivity {
         String cameraId = cameraManager.getCameraIdList()[0];
         cameraManager.setTorchMode(cameraId, true);
         Toast.makeText(MainActivity.this, "FlashLight ON", Toast.LENGTH_SHORT).show();
+
     }
 
     private void setupDigitResult()
@@ -479,8 +482,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    private void updateDigitResult()
-    {
+    private void updateDigitResult() {
         textNumber.setText(Integer.toString(gestureCalculations._digit));
     }
 
