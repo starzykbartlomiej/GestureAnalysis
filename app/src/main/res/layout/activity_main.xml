@@ -19,12 +19,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <Button
+        <ImageButton
             android:id="@+id/flash_button"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
-            android:text="@string/flash" />
+            android:src="@drawable/ic_flash"
+            android:background="@drawable/rounded_corner"
+            android:contentDescription="TODO" />
 
         <Space
             android:layout_width="wrap_content"
@@ -50,17 +52,20 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <Button
+        <ImageButton
             android:id="@+id/button_change_camera"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
-            android:text="@string/change_camera" />
+            android:src="@drawable/ic_flip"
+            android:background="@drawable/rounded_corner"
+            android:contentDescription="TODO" />
 
         <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
+
     </LinearLayout>
 
     <FrameLayout

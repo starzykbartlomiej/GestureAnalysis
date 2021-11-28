@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraInput cameraInput;
 
     //Camera Flash
-    private Button flashButton;
+    private ImageButton flashButton;
     boolean hasCameraFlash = false;
     boolean flashOn = false;
 
