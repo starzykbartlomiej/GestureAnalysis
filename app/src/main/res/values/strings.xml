@@ -9,7 +9,7 @@
     <string name="app_main_image">App main image</string>
     <string name="app_desc">Recognize ASL digits using camera, photos or videos.</string>
     <string name="app_title">Hand Gesture Recognition app</string>
-    <string name="number">Number</string>
+    <string name="number">No digit</string>
     <string name="flip">Flip</string>
     <string name="back">back</string>
 </resources>

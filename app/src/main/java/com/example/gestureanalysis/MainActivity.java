@@ -484,7 +484,13 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void updateDigitResult() {
-        textNumber.setText(Integer.toString(gestureCalculations._digit));
+        int result = gestureCalculations._digit;
+        if(result == -1){
+            textNumber.setText("No digit");
+        } else {
+            textNumber.setText(Integer.toString(gestureCalculations._digit));
+        }
+
     }
 
     private void setupCameraFlip() {
