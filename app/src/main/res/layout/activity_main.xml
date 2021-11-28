@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:weightSum="100">
 
@@ -20,14 +20,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <ImageButton
+
+        <Button
             android:id="@+id/flash_button"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_flash"
-            android:background="@drawable/rounded_corner"
-            android:contentDescription="TODO" />
+            android:text="@string/flash"
+            app:icon="@drawable/ic_flash"
+            style="?attr/materialButtonOutlinedStyle"
+            app:iconTint="@color/white"
+            android:textColor="@color/white"
+            app:strokeColor='@color/white'/>
 
         <Space
             android:layout_width="wrap_content"
@@ -36,31 +40,33 @@
 
         <TextView
             android:id="@+id/text_number"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="38dp"
-            android:layout_weight="5"
-            android:background="@drawable/rounded_corner"
+            android:layout_weight="1"
 
             android:fontFamily="@font/roboto_medium"
             android:gravity="center"
             android:text="@string/number"
             android:textAllCaps="true"
             android:textColor="@color/gesture_app_white"
-            android:textSize="14sp" />
+            android:textSize="20sp" />
 
         <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <ImageButton
+        <Button
             android:id="@+id/button_change_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_flip"
-            android:background="@drawable/rounded_corner"
-            android:contentDescription="TODO" />
+            android:text="@string/flip"
+            app:icon="@drawable/ic_flip"
+            style="?attr/materialButtonOutlinedStyle"
+            app:iconTint="@color/white"
+            android:textColor="@color/white"
+            app:strokeColor='@color/white'/>
 
         <Space
             android:layout_width="wrap_content"

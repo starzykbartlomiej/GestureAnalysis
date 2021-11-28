@@ -7,7 +7,8 @@
     <string name="change_camera" translatable="false">Flip</string>
     <string name="start_gesture_recognition">Start gesture recognition</string>
     <string name="app_main_image">App main image</string>
-    <string name="app_desc">Recognize numbers, letters and specific gestures.</string>
+    <string name="app_desc">Recognize ASL digits using camera, photos or videos.</string>
     <string name="app_title">Hand Gesture Recognition app</string>
     <string name="number">Number</string>
+    <string name="flip">Flip</string>
 </resources>

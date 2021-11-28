@@ -39,6 +39,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.exifinterface.media.ExifInterface;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.mediapipe.formats.proto.LandmarkProto.Landmark;
 import com.google.mediapipe.formats.proto.LandmarkProto.NormalizedLandmark;
 import com.google.mediapipe.solutioncore.CameraInput;
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private SolutionGlSurfaceView<HandsResult> glSurfaceView;
 
     //Camera Flash
-    private ImageButton flashButton;
+    private MaterialButton flashButton;
     boolean hasCameraFlash = false;
     boolean flashOn = false;
 
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textNumber;
 
     //Camera flip
-    private ImageButton FlipCamera;
+    private MaterialButton FlipCamera;
     private boolean isBackCameraOn = false;
 
 
