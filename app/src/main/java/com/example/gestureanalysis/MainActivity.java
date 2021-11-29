@@ -485,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void updateDigitResult() {
         int result = gestureCalculations._digit;
-        if(result == -1){
+        if (result == -1) {
             textNumber.setText("No digit");
         } else {
             textNumber.setText(Integer.toString(gestureCalculations._digit));
@@ -497,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
         //Camera flip
         Button flipCamera = findViewById(R.id.button_change_camera);
         flipCamera.setOnClickListener(view -> {
-            if(inputSource != InputSource.CAMERA){
+            if (inputSource != InputSource.CAMERA) {
                 return;
             }
             if (isBackCameraOn) {
