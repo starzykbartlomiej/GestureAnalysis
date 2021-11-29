@@ -6,12 +6,19 @@ import android.util.Log;
 import com.google.mediapipe.formats.proto.LandmarkProto;
 import com.google.mediapipe.solutions.hands.HandsResult;
 
+import java.util.stream.IntStream;
+
 public class GestureCalculations {
     private static final String TAG = "GestureCalculations";
-    double[][] landmarkMatrix;
+    int[][] landmarkMatrix;
     int _digit = -1;
-    GestureCalculations(){
-        landmarkMatrix = new double[21][3];
+    int[] _digits;
+    int _current_index;
+
+    GestureCalculations() {
+        landmarkMatrix = new int[21][2];
+        _digits = new int[]{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+        _current_index = 0;
     }
 
     public void logLandmarkPosition(HandsResult result, boolean showPixelValues, int position) {
@@ -54,76 +61,114 @@ public class GestureCalculations {
 
     private void updateLandmarkMatrix(HandsResult result) {
         LandmarkProto.NormalizedLandmark hand_position;
+        int width = result.inputBitmap().getWidth();
+        int height = result.inputBitmap().getHeight();
         for (int i = 0; i < 21; i++) {
             hand_position = result.multiHandLandmarks().get(0).getLandmarkList().get(i);
-            landmarkMatrix[i][0] = hand_position.getX();
-            landmarkMatrix[i][1] = hand_position.getY();
-            landmarkMatrix[i][2] = hand_position.getZ();
+            landmarkMatrix[i][0] = (int) (hand_position.getX() * width);
+            landmarkMatrix[i][1] = (int) (hand_position.getY() * height);
         }
-    }
-
-    public void logDigit(HandsResult result, boolean isCamera) {
-        if (result.multiHandLandmarks().isEmpty()) return;
-        updateLandmarkMatrix(result);
-
-        double[] p0 = new double[]{landmarkMatrix[0][1], landmarkMatrix[0][2]};
-
-        double[] p5 = new double[]{landmarkMatrix[5][1], landmarkMatrix[5][2]};
-        double[] p9 = new double[]{landmarkMatrix[9][1], landmarkMatrix[9][2]};
-        double[] p13 = new double[]{landmarkMatrix[13][1], landmarkMatrix[13][2]};
-        double[] p17 = new double[]{landmarkMatrix[17][1], landmarkMatrix[17][2]};
-
-        double[] p8 = new double[]{landmarkMatrix[8][1], landmarkMatrix[8][2]};
-        double[] p12 = new double[]{landmarkMatrix[12][1], landmarkMatrix[12][2]};
-        double[] p16 = new double[]{landmarkMatrix[16][1], landmarkMatrix[16][2]};
-        double[] p20 = new double[]{landmarkMatrix[20][1], landmarkMatrix[20][2]};
-
-        double[] p4 = new double[]{landmarkMatrix[4][1], landmarkMatrix[4][2]};
-
-
-        int thumb_f = euclideanLength(p4, p5) / euclideanLength(p5, p0) * 100 > 65 ? 1 : 0;
-        int index_f = euclideanLength(p5, p8) / euclideanLength(p5, p0) * 100 > 65 ? 1 : 0;
-        int middle_f = euclideanLength(p12, p9) / euclideanLength(p9, p0) * 100 > 65 ? 1 : 0;
-        int ring_f = euclideanLength(p16, p13) / euclideanLength(p13, p0) * 100 > 65 ? 1 : 0;
-        int pinky_f = euclideanLength(p20, p17) / euclideanLength(p17, p0) * 100 > 65 ? 1 : 0;
-
-        int digit = thumb_f + index_f + middle_f + ring_f + pinky_f;
-
-        Log.i(TAG, String.format("Detected: %d", digit));
     }
 
     public void detectDigit(HandsResult result, boolean isCamera) {
         if (result.multiHandLandmarks().isEmpty()) return;
         updateLandmarkMatrix(result);
+        int[] tipids = new int[]{4, 8, 12, 16, 20};
+        int[] fingerlist = new int[]{0, 0, 0, 0, 0};
+        //thumb and dealing with flipping of hands
+        if (landmarkMatrix[5][0] > landmarkMatrix[17][0]) {
+            // thumb to right
+            if (landmarkMatrix[tipids[0]][0] > landmarkMatrix[tipids[0] - 1][0])
+                fingerlist[0] = 1;
 
-        double[] p0 = new double[]{landmarkMatrix[0][1], landmarkMatrix[0][2]};
+            if (landmarkMatrix[9][1] > landmarkMatrix[0][1]) {
+                //to_top
+                for (int id = 1; id < 5; id++) {
+                    if (landmarkMatrix[tipids[id]][1] > landmarkMatrix[tipids[id] - 2][1])
+                        fingerlist[id] = 1;
+                    else
+                        fingerlist[id] = 0;
+                }
+            } else {
+                //o_bottom
+                for (int id = 1; id < 5; id++) {
+                    if (landmarkMatrix[tipids[id]][1] < landmarkMatrix[tipids[id] - 2][1])
+                        fingerlist[id] = 1;
+                    else
+                        fingerlist[id] = 0;
+                }
+            }
+        } else {
+            //thumb to left
+            if (landmarkMatrix[tipids[0]][0] < landmarkMatrix[tipids[0] - 1][0])
+                fingerlist[0] = 1;
 
-        double[] p5 = new double[]{landmarkMatrix[5][1], landmarkMatrix[5][2]};
-        double[] p9 = new double[]{landmarkMatrix[9][1], landmarkMatrix[9][2]};
-        double[] p13 = new double[]{landmarkMatrix[13][1], landmarkMatrix[13][2]};
-        double[] p17 = new double[]{landmarkMatrix[17][1], landmarkMatrix[17][2]};
+            if (landmarkMatrix[9][1] > landmarkMatrix[0][1]) {
+                //to_top
+                for (int id = 1; id < 5; id++) {
+                    if (landmarkMatrix[tipids[id]][1] > landmarkMatrix[tipids[id] - 2][1])
+                        fingerlist[id] = 1;
+                    else
+                        fingerlist[id] = 0;
+                }
+            } else {
+                //to_bottom
+                for (int id = 1; id < 5; id++) {
+                    if (landmarkMatrix[tipids[id]][1] < landmarkMatrix[tipids[id] - 2][1])
+                        fingerlist[id] = 1;
+                    else
+                        fingerlist[id] = 0;
+                }
+            }
+        }
 
-        double[] p8 = new double[]{landmarkMatrix[8][1], landmarkMatrix[8][2]};
-        double[] p12 = new double[]{landmarkMatrix[12][1], landmarkMatrix[12][2]};
-        double[] p16 = new double[]{landmarkMatrix[16][1], landmarkMatrix[16][2]};
-        double[] p20 = new double[]{landmarkMatrix[20][1], landmarkMatrix[20][2]};
+        int fingercount = -1;
+        int finger_sum = fingerlist[0] + fingerlist[1] + fingerlist[2] + fingerlist[3] + fingerlist[4];
+        if (finger_sum == 0)
+            fingercount = 0;
+        else if (finger_sum == 1 && fingerlist[1] == 1)
+            fingercount = 1;
+        else if (finger_sum == 2 && fingerlist[1] == 1 && fingerlist[2] == 1)
+            fingercount = 2;
+        else if (finger_sum == 3 && fingerlist[0] == 1 && fingerlist[1] == 1 && fingerlist[2] == 1)
+            fingercount = 3;
+        else if (finger_sum == 4 && fingerlist[1] == 1 && fingerlist[2] == 1 && fingerlist[3] == 1 && fingerlist[4] == 1)
+            fingercount = 4;
+        else if (finger_sum == 5 && fingerlist[0] == 1 && fingerlist[1] == 1 && fingerlist[2] == 1 && fingerlist[3] == 1 && fingerlist[4] == 1)
+            fingercount = 5;
+        else if (finger_sum == 3 && fingerlist[1] == 1 && fingerlist[2] == 1 && fingerlist[3] == 1)
+            fingercount = 6;
+        else if (finger_sum == 3 && fingerlist[1] == 1 && fingerlist[2] == 1 && fingerlist[4] == 1)
+            fingercount = 7;
+        else if (finger_sum == 3 && fingerlist[1] == 1 && fingerlist[3] == 1 && fingerlist[4] == 1)
+            fingercount = 8;
+        else if (finger_sum == 3 && fingerlist[2] == 1 && fingerlist[3] == 1 && fingerlist[4] == 1)
+            fingercount = 9;
 
-        double[] p4 = new double[]{landmarkMatrix[4][1], landmarkMatrix[4][2]};
+        _digits[_current_index] = fingercount;
+        if(_current_index >= 9)
+            _current_index = 0;
+        else
+            _current_index++;
 
-
-        int thumb_f = euclideanLength(p4, p5) / euclideanLength(p5, p0) * 100 > 65 ? 1 : 0;
-        int index_f = euclideanLength(p5, p8) / euclideanLength(p5, p0) * 100 > 65 ? 1 : 0;
-        int middle_f = euclideanLength(p12, p9) / euclideanLength(p9, p0) * 100 > 65 ? 1 : 0;
-        int ring_f = euclideanLength(p16, p13) / euclideanLength(p13, p0) * 100 > 65 ? 1 : 0;
-        int pinky_f = euclideanLength(p20, p17) / euclideanLength(p17, p0) * 100 > 65 ? 1 : 0;
-
-        int digit = thumb_f + index_f + middle_f + ring_f + pinky_f;
-
-        _digit = digit;
+        int count = 1, tempCount;
+        int popular = _digits[0];
+        int temp = 0;
+        for (int i = 0; i < (_digits.length - 1); i++)
+        {
+            temp = _digits[i];
+            tempCount = 0;
+            for (int j = 1; j < _digits.length; j++)
+            {
+                if (temp == _digits[j])
+                    tempCount++;
+            }
+            if (tempCount > count)
+            {
+                popular = temp;
+                count = tempCount;
+            }
+        }
+        _digit = popular;
     }
-
-    private double euclideanLength(double[] p1, double[] p2) {
-        return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));
-    }
-
 }
