@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     private SolutionGlSurfaceView<HandsResult> glSurfaceView;
 
     //Digits
-    private final GestureCalculations gestureCalculations = new GestureCalculations();
+    private GestureCalculations gestureCalculations = new GestureCalculations();
     private TextView textNumber;
 
     private boolean isBackCameraOn = true;
@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
                         vibrator.vibrate(vibrationEffect2);
                     }
+                    gestureCalculations = new GestureCalculations();
                 });
         imageView = new HandsResultImageView(this);
     }
@@ -254,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
         hands.setResultListener(
                 handsResult -> {
 //                    logWristLandmark(handsResult, /*showPixelValues=*/ true);
-                    gestureCalculations.detectDigit(handsResult, true);
+                    gestureCalculations.detectDigit(handsResult, false);
                     runOnUiThread(this::updateDigitResult);
                     imageView.setHandsResult(handsResult);
                     runOnUiThread(() -> imageView.update());
@@ -311,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
 
                         vibrator.vibrate(vibrationEffect2);
                     }
+                    gestureCalculations = new GestureCalculations();
                 });
     }
 
@@ -336,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
 
                         vibrator.vibrate(vibrationEffect2);
                     }
+                    gestureCalculations = new GestureCalculations();
                 });
     }
 
