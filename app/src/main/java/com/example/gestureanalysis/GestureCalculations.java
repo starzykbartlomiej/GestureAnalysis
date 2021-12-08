@@ -3,6 +3,7 @@ package com.example.gestureanalysis;
 import android.util.Log;
 
 import com.google.mediapipe.formats.proto.LandmarkProto;
+import com.google.mediapipe.solutions.hands.HandLandmark;
 import com.google.mediapipe.solutions.hands.HandsResult;
 
 public class GestureCalculations {
@@ -10,6 +11,8 @@ public class GestureCalculations {
     int _digit = -1;
     int[] _digits;
     int _current_index;
+    double point5;
+    double point9;
 
     GestureCalculations() {
         landmarkMatrix = new int[21][2];
@@ -26,6 +29,8 @@ public class GestureCalculations {
             landmarkMatrix[i][0] = (int) (hand_position.getX() * width);
             landmarkMatrix[i][1] = (int) (hand_position.getY() * height);
         }
+        point5 = result.multiHandWorldLandmarks().get(0).getLandmarkList().get(5).getY();
+        point9 = result.multiHandWorldLandmarks().get(0).getLandmarkList().get(9).getY();
     }
 
     public void detectDigit(HandsResult result, boolean isCamera) {
@@ -38,7 +43,7 @@ public class GestureCalculations {
         int[] fingerList = new int[]{0, 0, 0, 0, 0};
         // thumb to right
         if (landmarkMatrix[5][0] > landmarkMatrix[17][0]) {
-            // thumb to right
+            // lewa
             if (landmarkMatrix[tipIds[0]][0] > landmarkMatrix[tipIds[0] - 2][0] ||
                     landmarkMatrix[tipIds[0]][0] > landmarkMatrix[5][0])
                 fingerList[0] = 1;
@@ -60,31 +65,10 @@ public class GestureCalculations {
                         fingerList[id] = 0;
                 }
             }
-            // thumb to left
-        } else if (landmarkMatrix[5][0] < landmarkMatrix[17][0]) {
-            if (landmarkMatrix[tipIds[0]][0] < landmarkMatrix[tipIds[0] - 2][0] ||
-                    landmarkMatrix[tipIds[0]][0] < landmarkMatrix[5][0])
-                fingerList[0] = 1;
-
-            if (landmarkMatrix[9][1] > landmarkMatrix[0][1]) {
-                //to_top
-                for (int id = 1; id < 5; id++) {
-                    if (landmarkMatrix[tipIds[id]][1] > landmarkMatrix[tipIds[id] - 2][1])
-                        fingerList[id] = 1;
-                    else
-                        fingerList[id] = 0;
-                }
-            } else {
-                //to_bottom
-                for (int id = 1; id < 5; id++) {
-                    if (landmarkMatrix[tipIds[id]][1] < landmarkMatrix[tipIds[id] - 2][1])
-                        fingerList[id] = 1;
-                    else
-                        fingerList[id] = 0;
-                }
-            }
+        } else {
+            _digit = -1;
+            return;
         }
-
 
         int fingerCount = -1;
         int finger_sum = fingerList[0] + fingerList[1] + fingerList[2] + fingerList[3] + fingerList[4];
@@ -111,77 +95,79 @@ public class GestureCalculations {
         else if (finger_sum == 3 && fingerList[2] == 1 && fingerList[3] == 1 && fingerList[4] == 1)
             fingerCount = 9;
 
-        if (fingerCount == -1) {
-            fingerList = new int[]{0, 0, 0, 0, 0};
-            if (landmarkMatrix[5][1] < landmarkMatrix[17][1]) {
-                // thumb to top
-                if (landmarkMatrix[tipIds[0]][1] < landmarkMatrix[tipIds[0] - 2][1] ||
-                        landmarkMatrix[tipIds[0]][1] < landmarkMatrix[5][1])
-                    fingerList[0] = 1;
+//        if (fingerCount == -1) {
+//            fingerList = new int[]{0, 0, 0, 0, 0};
+//            if (landmarkMatrix[5][1] < landmarkMatrix[17][1]) {
+//                // thumb to top
+//                if (landmarkMatrix[tipIds[0]][1] < landmarkMatrix[tipIds[0] - 2][1] ||
+//                        landmarkMatrix[tipIds[0]][1] < landmarkMatrix[5][1])
+//                    fingerList[0] = 1;
+//
+//                if (landmarkMatrix[9][0] < landmarkMatrix[0][0]) {
+//                    for (int id = 1; id < 5; id++) {
+//                        if (landmarkMatrix[tipIds[id]][0] < landmarkMatrix[tipIds[id] - 2][0])
+//                            fingerList[id] = 1;
+//                        else
+//                            fingerList[id] = 0;
+//                    }
+//                } else if (landmarkMatrix[9][0] > landmarkMatrix[0][0]) {
+//                    for (int id = 1; id < 5; id++) {
+//                        if (landmarkMatrix[tipIds[id]][0] > landmarkMatrix[tipIds[id] - 2][0])
+//                            fingerList[id] = 1;
+//                        else
+//                            fingerList[id] = 0;
+//                    }
+//                }
+//            } else if (landmarkMatrix[5][1] > landmarkMatrix[17][1]) {
+//                //thumb to bottom
+//                if (landmarkMatrix[tipIds[0]][1] > landmarkMatrix[tipIds[0] - 2][1] ||
+//                        landmarkMatrix[tipIds[0]][1] > landmarkMatrix[5][1])
+//                    fingerList[0] = 1;
+//
+//                if (landmarkMatrix[9][0] < landmarkMatrix[0][0]) {
+//                    for (int id = 1; id < 5; id++) {
+//                        if (landmarkMatrix[tipIds[id]][0] > landmarkMatrix[tipIds[id] - 2][0])
+//                            fingerList[id] = 1;
+//                        else
+//                            fingerList[id] = 0;
+//                    }
+//                } else if (landmarkMatrix[9][0] > landmarkMatrix[0][0]) {
+//                    for (int id = 1; id < 5; id++) {
+//                        if (landmarkMatrix[tipIds[id]][0] < landmarkMatrix[tipIds[id] - 2][0])
+//                            fingerList[id] = 1;
+//                        else
+//                            fingerList[id] = 0;
+//                    }
+//                }
+//            }
+//        }
+//
+//        fingerCount = -1;
+//        finger_sum = fingerList[0] + fingerList[1] + fingerList[2] + fingerList[3] + fingerList[4];
+//        if (finger_sum == 0)
+//            fingerCount = 0;
+//        else if (finger_sum == 1 && fingerList[1] == 1)
+//            fingerCount = 1;
+//        else if (finger_sum == 2 && fingerList[1] == 1 && fingerList[2] == 1)
+//            fingerCount = 2;
+//        else if (finger_sum == 3 && fingerList[0] == 1 && fingerList[1] == 1 && fingerList[2] == 1)
+//            fingerCount = 3;
+//        else if (finger_sum == 4 && fingerList[1] == 1 && fingerList[2] == 1 && fingerList[3] == 1
+//                && fingerList[4] == 1)
+//            fingerCount = 4;
+//        else if (finger_sum == 5 && fingerList[0] == 1 && fingerList[1] == 1 && fingerList[2] == 1
+//                && fingerList[3] == 1 && fingerList[4] == 1)
+//            fingerCount = 5;
+//        else if (finger_sum == 3 && fingerList[1] == 1 && fingerList[2] == 1 && fingerList[3] == 1)
+//            fingerCount = 6;
+//        else if (finger_sum == 3 && fingerList[1] == 1 && fingerList[2] == 1 && fingerList[4] == 1)
+//            fingerCount = 7;
+//        else if (finger_sum == 3 && fingerList[1] == 1 && fingerList[3] == 1 && fingerList[4] == 1)
+//            fingerCount = 8;
+//        else if (finger_sum == 3 && fingerList[2] == 1 && fingerList[3] == 1 && fingerList[4] == 1)
+//            fingerCount = 9;
 
-                if (landmarkMatrix[9][0] < landmarkMatrix[0][0]) {
-                    for (int id = 1; id < 5; id++) {
-                        if (landmarkMatrix[tipIds[id]][0] < landmarkMatrix[tipIds[id] - 2][0])
-                            fingerList[id] = 1;
-                        else
-                            fingerList[id] = 0;
-                    }
-                } else if (landmarkMatrix[9][0] > landmarkMatrix[0][0]) {
-                    for (int id = 1; id < 5; id++) {
-                        if (landmarkMatrix[tipIds[id]][0] > landmarkMatrix[tipIds[id] - 2][0])
-                            fingerList[id] = 1;
-                        else
-                            fingerList[id] = 0;
-                    }
-                }
-            } else if (landmarkMatrix[5][1] > landmarkMatrix[17][1]) {
-                //thumb to bottom
-                if (landmarkMatrix[tipIds[0]][1] > landmarkMatrix[tipIds[0] - 2][1] ||
-                        landmarkMatrix[tipIds[0]][1] > landmarkMatrix[5][1])
-                    fingerList[0] = 1;
-
-                if (landmarkMatrix[9][0] < landmarkMatrix[0][0]) {
-                    for (int id = 1; id < 5; id++) {
-                        if (landmarkMatrix[tipIds[id]][0] > landmarkMatrix[tipIds[id] - 2][0])
-                            fingerList[id] = 1;
-                        else
-                            fingerList[id] = 0;
-                    }
-                } else if (landmarkMatrix[9][0] > landmarkMatrix[0][0]) {
-                    for (int id = 1; id < 5; id++) {
-                        if (landmarkMatrix[tipIds[id]][0] < landmarkMatrix[tipIds[id] - 2][0])
-                            fingerList[id] = 1;
-                        else
-                            fingerList[id] = 0;
-                    }
-                }
-            }
-        }
-
-        fingerCount = -1;
-        finger_sum = fingerList[0] + fingerList[1] + fingerList[2] + fingerList[3] + fingerList[4];
-        if (finger_sum == 0)
-            fingerCount = 0;
-        else if (finger_sum == 1 && fingerList[1] == 1)
-            fingerCount = 1;
-        else if (finger_sum == 2 && fingerList[1] == 1 && fingerList[2] == 1)
-            fingerCount = 2;
-        else if (finger_sum == 3 && fingerList[0] == 1 && fingerList[1] == 1 && fingerList[2] == 1)
-            fingerCount = 3;
-        else if (finger_sum == 4 && fingerList[1] == 1 && fingerList[2] == 1 && fingerList[3] == 1
-                && fingerList[4] == 1)
-            fingerCount = 4;
-        else if (finger_sum == 5 && fingerList[0] == 1 && fingerList[1] == 1 && fingerList[2] == 1
-                && fingerList[3] == 1 && fingerList[4] == 1)
-            fingerCount = 5;
-        else if (finger_sum == 3 && fingerList[1] == 1 && fingerList[2] == 1 && fingerList[3] == 1)
-            fingerCount = 6;
-        else if (finger_sum == 3 && fingerList[1] == 1 && fingerList[2] == 1 && fingerList[4] == 1)
-            fingerCount = 7;
-        else if (finger_sum == 3 && fingerList[1] == 1 && fingerList[3] == 1 && fingerList[4] == 1)
-            fingerCount = 8;
-        else if (finger_sum == 3 && fingerList[2] == 1 && fingerList[3] == 1 && fingerList[4] == 1)
-            fingerCount = 9;
+        Log.i("FFF)", String.format("%d %d %d %d %d ", fingerList[0], fingerList[1], fingerList[2], fingerList[3], fingerList[4]));
 
         _digits[_current_index] = fingerCount;
         if (_current_index >= 9)
@@ -213,7 +199,7 @@ public class GestureCalculations {
     }
 
     public void logLandmarkMatrix() {
-        Log.i("5)", String.format("x=%d, y=%d", landmarkMatrix[5][0], landmarkMatrix[5][1]));
-        Log.i("17", String.format("x=%d, y=%d", landmarkMatrix[17][0], landmarkMatrix[17][1]));
+
+        Log.i("17", String.format("%f", 100 * Math.abs(point5 - point9)));
     }
 }
