@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                                 .setStaticImageMode(true)
                                 .setMaxNumHands(1)
                                 .setRunOnGpu(RUN_ON_GPU)
-                                .setMinDetectionConfidence((float) 0.7)
+                                .setMinDetectionConfidence((float) 0.7) //todo add confidence as variable
                                 .build());
         hands.setErrorListener((message, e) -> Log.e(TAG, "MediaPipe Hands error:" + message));
 
@@ -374,8 +374,8 @@ public class MainActivity extends AppCompatActivity {
         glSurfaceView.setRenderInputImage(true);
         hands.setResultListener(
                 handsResult -> {
-//                    gestureCalculations.logLandmarkMatrix();
                     gestureCalculations.detectDigit(handsResult, true);
+                    gestureCalculations.logLandmarkMatrix();
                     runOnUiThread(this::updateDigitResult);
                     glSurfaceView.setRenderData(handsResult);
                     glSurfaceView.requestRender();
