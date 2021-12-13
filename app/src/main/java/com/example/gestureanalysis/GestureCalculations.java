@@ -41,10 +41,10 @@ public class GestureCalculations {
                     landmarkMatrix[tipIds[0]][0] > landmarkMatrix[5][0])
                 fingerList[0] = 1;
 
-            if (landmarkMatrix[9][1] > landmarkMatrix[0][1]) {
-                //to_top
+            if (landmarkMatrix[9][1] < landmarkMatrix[0][1]) {
+                //o_bottom
                 for (int id = 1; id < 5; id++) {
-                    if (landmarkMatrix[tipIds[id]][1] > landmarkMatrix[tipIds[id] - 2][1])
+                    if (landmarkMatrix[tipIds[id]][1] < landmarkMatrix[tipIds[id] - 2][1])
                         fingerList[id] = 1;
                     else
                         fingerList[id] = 0;
@@ -56,10 +56,10 @@ public class GestureCalculations {
                     landmarkMatrix[tipIds[0]][0] < landmarkMatrix[5][0])
                 fingerList[0] = 1;
 
-            if (landmarkMatrix[9][1] > landmarkMatrix[0][1]) {
-                //to_top
+            if (landmarkMatrix[9][1] < landmarkMatrix[0][1]) {
+                //to_bottom
                 for (int id = 1; id < 5; id++) {
-                    if (landmarkMatrix[tipIds[id]][1] > landmarkMatrix[tipIds[id] - 2][1])
+                    if (landmarkMatrix[tipIds[id]][1] < landmarkMatrix[tipIds[id] - 2][1])
                         fingerList[id] = 1;
                     else
                         fingerList[id] = 0;

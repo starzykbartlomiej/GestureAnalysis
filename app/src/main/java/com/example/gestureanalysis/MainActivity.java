@@ -375,7 +375,6 @@ public class MainActivity extends AppCompatActivity {
         hands.setResultListener(
                 handsResult -> {
                     gestureCalculations.detectDigit(handsResult, true);
-                    gestureCalculations.logLandmarkMatrix();
                     runOnUiThread(this::updateDigitResult);
                     glSurfaceView.setRenderData(handsResult);
                     glSurfaceView.requestRender();
